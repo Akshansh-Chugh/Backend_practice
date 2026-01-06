@@ -1,15 +1,41 @@
 import express from "express";
-import connectDB from "./db/index.js"
+import cors from "cors"
+import cookieParser from "cookie-parser"
 
-const app = express();
-port= process.env.PORT || 3000
+const app=express()
+app.use(cors(
+    {
+        origin: process.env.CORS_ORIGIN,
+    }
+))
+app.use(express.json(
+    {
+        limit: "32kb"
+    }
+))
+app.use(express.urlencoded(
+    {
+        limit: "2kb"
+    }
+))
+app.use(express.static("public"))
+app.use(cookieParser())
+
+export {app}
 
 
-connectDB()
-.then(
-    app.listen(port,(req,res)=> console.log(`listening on ${port}`))
-)
 
-.catch((err)=> console.log("Db connect error",err))
+// import connectDB from "./db/index.js"
 
-export default {app}
+// const app = express();
+// port= process.env.PORT || 3000
+
+
+// connectDB()
+// .then(
+//     app.listen(port,(req,res)=> console.log(`listening on ${port}`))
+// )
+
+// .catch((err)=> console.log("Db connect error",err))
+
+// export default {app}
