@@ -1,15 +1,19 @@
-// import mongoose from "mongoose"
-// import dotenv from "dotenv/config"
-// import express from "express";
-
-// const app = express();
-// port= process.env.PORT || 3000
-
 import connectDB from "./db/index.js"
+import { asyncHandler } from "./utils/asyncHandler.js"
+import { app } from "./app.js"
 
-connectDB()
 
+const port = process.env.PORT || 3000
 
+asyncHandler(connectDB()
+.then(() => {
+    app.listen(port, (res,req)=>{})
+})
+.catch((err) => {
+    console.log("MONGO db connection failed !!! ", err);
+}))
+
+console.log("Success")
 
 // ;(async()=>{
 //     try{
