@@ -1,7 +1,7 @@
 import connectDB from "./db/index.js"
 import { asyncHandler } from "./utils/asyncHandler.js"
 import { app } from "./app.js"
-
+import "dotenv/config"
 
 const port = process.env.PORT || 3000
 
