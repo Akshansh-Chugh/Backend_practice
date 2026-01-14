@@ -1,5 +1,4 @@
 import {v2 as cloudnary} from "cloudinary"
-import { error } from "console"
 import dotenv from "dotenv"
 import fs from "fs"
 
@@ -28,15 +27,13 @@ const toCloud = async(file)=>
             }
         )
         console.log(`${file.resource_type} uploaded at ${response.secure_url}}`)
+        return response
     }
     catch(error)
     {
         console.log(error)
-    }
-    finally
-    {
-        if (file) fs.unlinkSync(file)
-        return response
+        // if (file) fs.unlinkSync(file)
+        // return response
     }
 }
 

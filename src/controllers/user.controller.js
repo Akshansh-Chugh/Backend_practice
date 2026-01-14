@@ -16,7 +16,6 @@ const registerUser= asyncHandler(async (req,res)=>
     // check if created
     //return
     var {fullName,username,email,password}=req.body
-    console.log(req.body)
     
     username = username.toLowerCase().trim()
     email = email.toLowerCase().trim();
@@ -30,26 +29,25 @@ const registerUser= asyncHandler(async (req,res)=>
         throw apiError(statuscode=411,message="Already exists")
     
     const avatar_l=req.files?.avatar[0]?.path
-    const profilePic_l=req.files?.profilePic[0]?.path
+    let profilePic_l
+    if (Array.isArray(req.files.profilePic) && req.files.profilePic.length > 0) profilePic_l=req.files?.profilePic[0]?.path
 
     if (!avatar_l) throw new apiError(400,"Avatar is required")
 
     const avatar_c=await toCloud(avatar_l)
     const profile_c=await toCloud(profilePic_l)
     
-    if (!avatar_c) throw new apiError(400,"Avatar is required")
-    
+    if (!avatar_c) throw new apiError(502,"Avatar could not be uploaded")
     const user= await User.create(
         {
             fullName:fullName,
             username:username.toLowerCase(),
             email:email,
             password:password,
-            avatar:avatar_c.secure_url,
-            profilePic:profile_c?.secure_url ||""
+            avatar:avatar_c.url,
+            profilePic:profile_c?.url ||""
         }
     )
-
     const created= await User.findById(user._id).select("-password -refreshtoken")
 
     if (!created) throw new apiError(500,"Something went wrong , user not created")
@@ -59,5 +57,4 @@ const registerUser= asyncHandler(async (req,res)=>
             new apiResponse(200 , created, "user registered successfully")
         )
 })
-console.log (typeof(registerUser))
 export {registerUser}

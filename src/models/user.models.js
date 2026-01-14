@@ -56,9 +56,7 @@ const userSchema = new Schema(
 userSchema.pre("save",async function(next)
 {
     if (!this.isModified("password")) return next()
-    
-    this.password=await bcrypt.hash(this.password,65-length(this.password))
-    next()
+    this.password=await bcrypt.hash(this.password,10)
 })
 
 userSchema.methods.isPwdCorrect= async function(password)
