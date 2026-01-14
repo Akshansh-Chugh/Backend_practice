@@ -36,7 +36,8 @@ const userSchema = new Schema(
             type:String
         },
         avatar:{
-            type:String
+            type:String,
+            required:true
         },
         refreshtoken:{               //jwt(json Web token)
             type:String
@@ -52,11 +53,12 @@ const userSchema = new Schema(
         timestamps:true
     },
 )
-userSchema.pre("save",function(next)
+userSchema.pre("save",async function(next)
 {
     if (!this.isModified("password")) return next()
     
-    this.password=bcrypt.hash(this.password,65-length(this.password))
+    this.password=await bcrypt.hash(this.password,65-length(this.password))
+    next()
 })
 
 userSchema.methods.isPwdCorrect= async function(password)
