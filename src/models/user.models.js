@@ -50,7 +50,7 @@ const userSchema = new Schema(
         ],
     },
     {
-        timestamps:tru
+        timestamps:true
     },
 )
 userSchema.pre("save",async function(next)
