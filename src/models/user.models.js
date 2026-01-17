@@ -39,7 +39,7 @@ const userSchema = new Schema(
             type:String,
             required:true
         },
-        refreshtoken:{               //jwt(json Web token)
+        refreshToken:{               //jwt(json Web token)
             type:String
         },
         watchHistory:[
