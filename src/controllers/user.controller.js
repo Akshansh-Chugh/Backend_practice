@@ -23,10 +23,10 @@ const registerUser= asyncHandler(async (req,res)=>
     if (!username || !email || !password || !fullName) throw new apiError(400,"All fields are required")
 
 
-    if (!User.findOne({
+    if (await User.findOne({
         $or: [ { username }, { email } ]
     }))
-        throw apiError(statuscode=411,message="Already exists")
+        throw new apiError(411,"Already exists")
     
     const avatar_l=req.files?.avatar[0]?.path
     let profilePic_l
@@ -57,4 +57,85 @@ const registerUser= asyncHandler(async (req,res)=>
             new apiResponse(200 , created, "user registered successfully")
         )
 })
-export {registerUser}
+
+
+const loginUser= asyncHandler(async (req,res)=>
+{
+    //body -> uername , email, pwd and not empty
+    // user exsists 
+    // pwd
+    // tokens
+    // cookies
+    // retun ok
+
+    console.log(req.body)
+    var {username , email , password}=req.body
+    username=username.toLowerCase().trim()
+    email=email.toLowerCase().trim()
+
+    if ((!username && !email) || !password ) 
+        throw new apiError(400,"All fields are required")
+    
+    
+    const user =await User.findOne({$or: [ { username }, { email } ]})
+    
+    if (!user)
+        throw new apiError(404,"User not found")
+    
+    
+    if(!await user.isPwdCorrect(password))
+         throw new apiError(401,"Invalid credentials")
+
+    const accessToken=user.generateAccessToken()
+    const refreshToken=user.generateRefreshToken()
+
+    const cookieSettings={
+        httpOnly:true,
+        secure: true
+    }
+    res.status(200)
+    .cookie("accessToken",accessToken,cookieSettings)
+    .cookie("refreshToken",refreshToken,cookieSettings)
+
+
+    .json( new apiResponse(200, 
+        {
+            user : user,
+            accessToken : accessToken,
+            refreshToken : refreshToken
+        },
+        "Login successful"
+    ))})
+
+    const logoutUser= asyncHandler(async (req,res)=>
+    {
+        const cookieSettings={
+        httpOnly:true,
+        secure: true
+    }
+        await User.findByIdAndUpdate(
+            req.user._id,
+            {
+                $set:
+                {
+                    refreshtoken:undefined
+                }
+            },
+            {
+                new:true
+            
+            }
+        )
+
+        return res.status(200)
+        .clearCookie("accessToken",cookieSettings)
+        .clearCookie("refreshToken",cookieSettings)
+        .json(new apiResponse(200,{},"Logout successful"))
+    })
+
+export {
+
+    registerUser,
+    loginUser,
+    logoutUser
+}

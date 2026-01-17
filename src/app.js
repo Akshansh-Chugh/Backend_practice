@@ -10,12 +10,12 @@ app.use(cors(
 ))
 app.use(express.json(
     {
-        limit: "32kb"
+        limit: "3200kb"
     }
 ))
 app.use(express.urlencoded(
     {
-        limit: "32kb"
+        limit: "3200kb"
     }
 ))
 app.use(express.static("public"))
