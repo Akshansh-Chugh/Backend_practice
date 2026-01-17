@@ -3,7 +3,7 @@ import {User} from "../models/user.models.js"
 import { apiError } from "../utils/apiErrors.js"
 import { toCloud } from "../utils/cloudinary.js"
 import { apiResponse } from "../utils/apiResponse.js"
-
+import fs from "fs"
 
 const registerUser= asyncHandler(async (req,res)=>
 {
@@ -36,6 +36,9 @@ const registerUser= asyncHandler(async (req,res)=>
 
     const avatar_c=await toCloud(avatar_l)
     const profile_c=await toCloud(profilePic_l)
+
+    fs.unlinkSync(avatar_l)
+        if (profilePic_l) fs.unlinkSync(profilePic_l)
     
     if (!avatar_c) throw new apiError(502,"Avatar could not be uploaded")
     const user= await User.create(
@@ -51,7 +54,6 @@ const registerUser= asyncHandler(async (req,res)=>
     const created= await User.findById(user._id).select("-password -refreshtoken")
 
     if (!created) throw new apiError(500,"Something went wrong , user not created")
-
 
     return res.status(200).json(
             new apiResponse(200 , created, "user registered successfully")
