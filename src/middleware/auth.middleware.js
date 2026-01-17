@@ -1,7 +1,6 @@
 import { apiError } from "../utils/apiErrors.js"
 import { asyncHandler } from "../utils/asyncHandler.js"
 import jwt  from "jsonwebtoken"
-// import dotenv from "dotenv"
 import { User } from "../models/user.models.js"
 
 
@@ -18,7 +17,7 @@ const Jwt= asyncHandler(async(req,res,next)=>
     
         if (!decodedToken) throw new apiError(407,`Invalid token ${token}`)
     
-       const user= await User.findById(decodedToken._id).select("-password -refreshtoken")
+       const user= await User.findById(decodedToken._id).select("-password -refreshToken")
     
         if (!user) throw new apiError(401, "Invalid Access token")
     
