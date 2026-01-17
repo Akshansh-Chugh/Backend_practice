@@ -6,6 +6,12 @@ import { apiResponse } from "../utils/apiResponse.js"
 import fs from "fs"
 import jwt from "jsonwebtoken"
 
+
+const cookieSettings={
+        httpOnly:true,
+        secure: true
+    }
+
 const registerUser = asyncHandler(async (req, res) => {
     // Input validation
     const { fullName, username, email, password } = req.body;
@@ -16,14 +22,12 @@ const registerUser = asyncHandler(async (req, res) => {
     const processedUsername = username.toLowerCase().trim();
     const processedEmail = email.toLowerCase().trim();
 
-    // existing user
+    // existing user?
     const existingUser = await User.findOne({
-        $or: [{ username: processedUsername }, { email: processedEmail }],
-    });
+        $or: [{ username: processedUsername }, { email: processedEmail }],});
 
     if (existingUser) {
-        throw new apiError(409, "Username or email already exists");
-    }
+        throw new apiError(409, "Username or email already exists");}
 
     // Check for files
     const avatarLocalPath = req.files?.avatar?.[0]?.path;
@@ -38,7 +42,7 @@ const registerUser = asyncHandler(async (req, res) => {
     try {
         [avatarCloud, profilePicCloud] = await Promise.all([
             toCloud(avatarLocalPath),
-            profilePicLocalPath ? toCloud(profilePicLocalPath) : Promise.resolve(null)
+            profilePicLocalPath? toCloud(profilePicLocalPath) : Promise.resolve(null)
         ]);
     } finally {
         // Cleanup 
@@ -79,13 +83,10 @@ const registerUser = asyncHandler(async (req, res) => {
     );
 });
 
-const cookieSettings={
-        httpOnly:true,
-        secure: true
-    }
+
 const loginUser= asyncHandler(async (req,res)=>
 {
-    //body -> uername , email, pwd and not empty
+    // body -> uername , email, pwd and not empty
     // user exsists 
     // pwd
     // tokens
@@ -116,16 +117,10 @@ const loginUser= asyncHandler(async (req,res)=>
 
     const accessToken=user.generateAccessToken()
     const refreshToken=user.generateRefreshToken()
+
     await User.findByIdAndUpdate(user._id,
-        {
-            $set:
-            {
-                refreshToken:refreshToken
-            }
-        },
-        {
-            new:true
-        }
+        {$set:{refreshToken:refreshToken}},
+        {new:true}
     )
     res.status(200)
     .cookie("accessToken",accessToken,cookieSettings)
@@ -137,22 +132,13 @@ const loginUser= asyncHandler(async (req,res)=>
             refreshToken : refreshToken
         },
         "Login successful"
-    ))})
+))})
 
     const logoutUser= asyncHandler(async (req,res)=>
     {
-        await User.findByIdAndUpdate(
-            req.user._id,
-            {
-                $set:
-                {
-                    refreshToken:undefined
-                }
-            },
-            {
-                new:true
-            
-            }
+        await User.findByIdAndUpdate(req.user._id,
+            {$set:{refreshToken:undefined}},
+            {new:true}
         )
         return res.status(200)
         .clearCookie("accessToken",cookieSettings)
@@ -185,17 +171,9 @@ const generateTokens= asyncHandler(async (req,res)=>
     const accessToken=user.generateAccessToken()
     const newRefreshToken=user.generateRefreshToken()
     
-    await User.findByIdAndUpdate(
-        user._id,
-        {
-            $set:
-            {
-                refreshToken:newRefreshToken
-            }
-        },
-        {
-            new:true
-        }
+    await User.findByIdAndUpdate(user._id,
+        {$set:  {refreshToken:newRefreshToken}  },
+        {new:true}
     )
 
 
