@@ -49,10 +49,7 @@ const videoSchema = new Schema(
             type:Boolean,
             default:false
         },
-        publishedAt:{
-            type:Date,
-        },
-        createdBy:{
+        owner:{
             type:mongoose.Schema.Types.ObjectId,
             ref:'User',
             required:true
