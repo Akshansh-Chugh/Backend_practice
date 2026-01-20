@@ -146,7 +146,6 @@ const loginUser= asyncHandler(async (req,res)=>
         .json(new apiResponse(200,{},"Logout successful"))
     })
 
-
 const generateTokens= asyncHandler(async (req,res)=>
 {
     //old refreshtoken
@@ -185,10 +184,93 @@ const generateTokens= asyncHandler(async (req,res)=>
     ))
 }
 )
+
+const changeUserPassword= asyncHandler(async (req,res)=>
+{
+    const {oldPassword, newPassword}=req.body
+    const user= await User.findById(req.user?._id) // 404 handeled by middleware (in ../roues/user.routes.js)
+    
+    const isPwdCorrect= await user.isPwdCorrect(oldPassword)
+    if (!isPwdCorrect) throw new apiError(400,"Invalid credentials")
+
+    user.password=newPassword
+    await user.save({validateBeforeSave:false})
+    
+    return res.status(200)
+    .json(new apiResponse(200,{},"pwd changed successfully"))
+
+})
+
+const getCurrentUser= asyncHandler(async (req,res)=>
+{
+    return res.status(200)
+    .json(new apiResponse(200,req.user,"Fetch successfull")) //auth.middleware
+})
+
+const updateUserDetails= asyncHandler(async (req,res)=>
+{
+    const {fullName, email}=req.body
+    if(!fullName || !email) throw new apiError(400,"All fields are required")
+    
+    await User.findByIdAndUpdate(req.user?._id,
+        {$set:{fullName,email}},
+        {new:true})
+        .select("-password")
+    req.status(200)
+    .json(new apiResponse(200,req.user,"Update successfull"))
+})
+
+const updateAvatar= asyncHandler(async (req,res)=>
+{
+    const avatar_l=req.file?.path
+
+    if (!avatar_l) throw new apiError(400,"Avatar is required")
+
+    const avatar_c= await toCloud(avatar_l)
+    fs.unlinkSync(avatar_l)
+
+    if(!avatar_c.url) 
+        throw new apiError(502,"Avatar could not be uploaded")
+
+    await toCloud.destroy(req.user?.avatar) //del from cloudinary
+
+    const user=await User.findByIdAndUpdate(req.user?._id,
+        {$set:{avatar:avatar_c.url}},
+        {new:true})
+        .select("-password")
+        .json(new apiResponse(200,user,"Update successfull"))
+})
+
+const updateProfilePic= asyncHandler(async (req,res)=>
+{
+    const profilePic_l=req.file?.path
+
+    if (!profilePic_l) throw new apiError(400,"Profile pic is required")
+
+    const profilePic_c= await toCloud(profilePic_l)
+    if (!profilePic_c) throw new apiError(502,"Profile pic could not be uploaded")
+    fs.unlinkSync(profilePic_l)
+
+    if(!profilePic_c.url) 
+        throw new apiError(502,"Profile pic could not be uploaded")
+    await toCloud.destroy(req.user?.profilePic) //del from cloudinary
+    const user = await User.findByIdAndUpdate(req.user?._id,
+        {$set:{profilePic:profilePic_c.url}},
+        {new:true})
+        .select("-password")
+        .json(new apiResponse(200,user,"Update successfull"))
+})
+
 export {
 
     registerUser,
     loginUser,
     logoutUser,
-    generateTokens
+    generateTokens,
+    changeUserPassword, //auth
+    getCurrentUser, //auth
+    updateUserDetails, //auth
+    updateAvatar, //auth, multer
+    updateProfilePic //auth, multer
+
 }

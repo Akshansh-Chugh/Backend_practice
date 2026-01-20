@@ -1,5 +1,6 @@
 import {Router} from "express"
-import {registerUser , loginUser , logoutUser, generateTokens} from "../controllers/user.controller.js"
+router.route("/getCurrentUser").post(Jwt,getCurrentUser)
+import {registerUser , loginUser , logoutUser, generateTokens, changeUserPassword, getCurrentUser, updateUserDetails, updateAvatar, updateProfilePic} from "../controllers/user.controller.js"
 import upload from "../middleware/multer.js"
 import Jwt from "../middleware/auth.middleware.js"
 
@@ -13,6 +14,11 @@ router.route("/register")
 // secure
 router.route("/logout").post(Jwt,logoutUser)
 router.route("/refreshTokens").post(generateTokens)
+router.route("/changePassword").post(Jwt,changeUserPassword)
+router.route("/getCurrentUser").post(Jwt,getCurrentUser)
+router.route("/update").post(Jwt,updateUserDetails)
+router.route("/updateAvatar").post(Jwt,upload.upload.single("avatar"),updateAvatar)
+router.route("/updateProfilePic").post(Jwt,upload.upload.single("profilePic"),updateProfilePic)
 
 
 export default router
