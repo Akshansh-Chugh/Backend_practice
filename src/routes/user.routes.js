@@ -1,6 +1,5 @@
 import {Router} from "express"
-router.route("/getCurrentUser").post(Jwt,getCurrentUser)
-import {registerUser , loginUser , logoutUser, generateTokens, changeUserPassword, getCurrentUser, updateUserDetails, updateAvatar, updateProfilePic} from "../controllers/user.controller.js"
+import {registerUser , loginUser , logoutUser, generateTokens, changeUserPassword, getCurrentUser, updateUserDetails, updateAvatar, updateProfilePic,getWatchHistory} from "../controllers/user.controller.js"
 import upload from "../middleware/multer.js"
 import Jwt from "../middleware/auth.middleware.js"
 
@@ -19,6 +18,6 @@ router.route("/getCurrentUser").post(Jwt,getCurrentUser)
 router.route("/update").post(Jwt,updateUserDetails)
 router.route("/updateAvatar").post(Jwt,upload.upload.single("avatar"),updateAvatar)
 router.route("/updateProfilePic").post(Jwt,upload.upload.single("profilePic"),updateProfilePic)
-
+router.route("/getWatchHistory").post(Jwt,getWatchHistory)
 
 export default router
