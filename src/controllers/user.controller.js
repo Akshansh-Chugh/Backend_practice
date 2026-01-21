@@ -1,7 +1,7 @@
 import {asyncHandler} from "../utils/asyncHandler.js"
 import {User} from "../models/user.models.js"
 import { apiError } from "../utils/apiErrors.js"
-import { toCloud } from "../utils/cloudinary.js"
+import { toCloud , cloudDelete} from "../utils/cloudinary.js"
 import { apiResponse } from "../utils/apiResponse.js"
 import fs from "fs"
 import jwt from "jsonwebtoken"
@@ -216,7 +216,8 @@ const updateUserDetails= asyncHandler(async (req,res)=>
         {$set:{fullName,email}},
         {new:true})
         .select("-password")
-    req.status(200)
+
+    res.status(200)
     .json(new apiResponse(200,req.user,"Update successfull"))
 })
 
@@ -232,19 +233,19 @@ const updateAvatar= asyncHandler(async (req,res)=>
     if(!avatar_c.url) 
         throw new apiError(502,"Avatar could not be uploaded")
 
-    await toCloud.destroy(req.user?.avatar) //del from cloudinary
+    await cloudDelete(req.user?.avatar) //del from cloudinary
 
     const user=await User.findByIdAndUpdate(req.user?._id,
         {$set:{avatar:avatar_c.url}},
         {new:true})
         .select("-password")
-        .json(new apiResponse(200,user,"Update successfull"))
+        
+    res.status(200).json(new apiResponse(200,user,"Update successfull"))
 })
 
 const updateProfilePic= asyncHandler(async (req,res)=>
 {
     const profilePic_l=req.file?.path
-
     if (!profilePic_l) throw new apiError(400,"Profile pic is required")
 
     const profilePic_c= await toCloud(profilePic_l)
@@ -253,12 +254,13 @@ const updateProfilePic= asyncHandler(async (req,res)=>
 
     if(!profilePic_c.url) 
         throw new apiError(502,"Profile pic could not be uploaded")
-    await toCloud.destroy(req.user?.profilePic) //del from cloudinary
+    await cloudDelete(req.user?.profilePic) //del from cloudinary
     const user = await User.findByIdAndUpdate(req.user?._id,
         {$set:{profilePic:profilePic_c.url}},
         {new:true})
         .select("-password")
-        .json(new apiResponse(200,user,"Update successfull"))
+    
+    res.status(200).json(new apiResponse(200,user,"Update successfull"))
 })
 
 const getWatchHistory= asyncHandler(async (req,res)=>

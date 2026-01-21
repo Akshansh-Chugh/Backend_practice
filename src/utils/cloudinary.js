@@ -1,5 +1,6 @@
 import {v2 as cloudnary} from "cloudinary"
 import dotenv from "dotenv"
+import { asyncHandler } from "./asyncHandler.js"
 
 dotenv.config()
 
@@ -35,5 +36,24 @@ const toCloud = async(file)=>
         // return response
     }
 }
+const cloudDelete= (async (url)=>
+{
+    try
+    {
+        if (!url) 
+            {
+                console.log("no file")
+                return null}
+        const response =await cloudnary.uploader.destroy(url.split("/").pop().split(".")[0])
+        console.log(`${url} deleted`)
+        return response
+    }
+    catch(error)
+    {
+        console.log(error)
+    }
+}
 
-export {toCloud}
+)
+
+export {toCloud , cloudDelete}
