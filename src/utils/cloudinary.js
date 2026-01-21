@@ -1,6 +1,5 @@
 import {v2 as cloudnary} from "cloudinary"
 import dotenv from "dotenv"
-import fs from "fs"
 
 dotenv.config()
 
@@ -10,9 +9,9 @@ cloudnary.config({
     api_secret:process.env.CLOUDINARY_API_SECRET,
 })
 
-console.log(process.env.CLOUDINARY_CLOUD_NAME)
-console.log(process.env.CLOUDINARY_API_KEY)
-console.log(process.env.CLOUDINARY_API_SECRET)
+// console.log(process.env.CLOUDINARY_CLOUD_NAME)
+// console.log(process.env.CLOUDINARY_API_KEY)
+// console.log(process.env.CLOUDINARY_API_SECRET)
 const toCloud = async(file)=>
 {
     try

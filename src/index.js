@@ -5,7 +5,7 @@ import "dotenv/config"
 
 const port = process.env.PORT || 3000
 
-asyncHandler(connectDB()
+asyncHandler(await connectDB()
 .then(() => {
     app.listen(port, (res,req)=>{})
 })
