@@ -261,6 +261,12 @@ const updateProfilePic= asyncHandler(async (req,res)=>
         .json(new apiResponse(200,user,"Update successfull"))
 })
 
+const getWatchHistory= asyncHandler(async (req,res)=>
+{
+    res.status(200)
+    .json(new apiResponse(200,req.user?.watchHistory,"Fetch successfull"))
+
+})
 export {
 
     registerUser,
@@ -271,6 +277,7 @@ export {
     getCurrentUser, //auth
     updateUserDetails, //auth
     updateAvatar, //auth, multer
-    updateProfilePic //auth, multer
+    updateProfilePic, //auth, multer
+    getWatchHistory //auth
 
 }
