@@ -1,6 +1,7 @@
 import {v2 as cloudnary} from "cloudinary"
 import dotenv from "dotenv"
 import { asyncHandler } from "./asyncHandler.js"
+import { apiError } from "./apiErrors.js"
 
 dotenv.config()
 
@@ -45,6 +46,7 @@ const cloudDelete= (async (url)=>
                 console.log("no file")
                 return null}
         const response =await cloudnary.uploader.destroy(url.split("/").pop().split(".")[0])
+        if (response.result !== "ok") throw new apiError(500, "delete failed")
         console.log(`${url} deleted`)
         return response
     }
