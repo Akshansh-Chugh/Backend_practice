@@ -110,7 +110,7 @@ const getDetails= asyncHandler(async (req,res)=>
 })
 
 export {
-    upload,            // jwt, getVideo, multer
+    upload,            // jwt, multer
     publish,           // jwt, getVideo,
     updateDetails,     // jwt, getVideo,
     deleteVideo ,      // jwt, getVideo,
