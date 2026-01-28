@@ -5,7 +5,7 @@ import { apiError } from "../utils/apiErrors";
 
 const getVideo= asyncHandler(async (req,res)=>
 {
-    const video= await Video.findById(req.params.id)
+    const video= await Video.findOne({username:req.params.username})
     if (!video) throw new apiError(404,"Video not found")
     req.video=video
 

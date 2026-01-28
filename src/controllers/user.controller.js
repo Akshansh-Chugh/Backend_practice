@@ -269,6 +269,67 @@ const getWatchHistory= asyncHandler(async (req,res)=>
     .json(new apiResponse(200,req.user?.watchHistory,"Fetch successfull"))
 
 })
+
+const getChannelDetails= asyncHandler(async (req,res)=>
+{
+        // update subs count in user table in v2 
+    // find channel
+    // add followers , following
+    // check is subscribed?
+
+    const channel= await User.findOne({username:req.params.username})
+    if (!channel) throw new apiError(404,"Channel not found")
+
+    let followers = User.aggregate([{$match:{_id:channel._id}},
+        {
+            $lookup:{
+                from:"subscriptions",
+                localField:"_id",
+                foreignField:"to",
+                as:"followers"
+            }
+        },{
+            $lookup:{
+                from:"subscriptions",
+                localField:"_id",
+                foreignField:"by",
+                as:"following"
+            }
+        },
+        {
+            $addFields:{
+                followers:{$size:"$followers"},
+                following:{$size:"$following"},
+                isFollowing:
+                {
+                    $cond:
+                    {
+                        if:{$in:[req.user?._id,"$followers.by"]},
+                        then:true,
+                        else:false
+                    }
+                }
+            }
+        },
+        {
+            $project:{
+                "username":1,
+                "email":1,
+                "avatar":1,
+                "profilePic":1,
+                "followers":1,
+                "following":1,
+                "isFollowing":1,
+                "fullName":1
+            }
+
+        }
+    ])
+    if (!followers?.length) throw new apiError(404,"Channel not found")
+    res.status(200)
+    .json(new apiResponse(200,followers[0],"Fetch successfull"))
+})
+
 export {
 
     registerUser,
@@ -280,6 +341,7 @@ export {
     updateUserDetails, //auth
     updateAvatar, //auth, multer
     updateProfilePic, //auth, multer
-    getWatchHistory //auth
+    getWatchHistory, //auth
+    getChannelDetails, //auth
 
 }
